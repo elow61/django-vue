@@ -68,29 +68,44 @@
                 } catch (error) {
                     console.log(error)
                 }
-            }
-        },
-        async toggleTask (task) {
-            try {
-                // Send a request to API to update the task
-                const response = await this.$http.put(`http://localhost:8000/api/tasks/${task.id}/`, {
-                    completed: !task.completed,
-                    title: task.title,
-                    description: task.description
-                })
+            },
+            async toggleTask (task) {
+                try {
+                    // Send a request to API to update the task
+                    const response = await this.$http.put(`http://localhost:8000/api/tasks/${task.id}/`, {
+                        completed: !task.completed,
+                        title: task.title,
+                        description: task.description
+                    })
 
-                // Get the index of the task being updated
-                let taskIndex = this.tasks.findIndex(t => t.id === task.id)
+                    // Get the index of the task being updated
+                    let taskIndex = this.tasks.findIndex(t => t.id === task.id)
 
-                // Reset the tasks array with the new data of the updated task
-                this.tasks = this.tasks.map((task) => {
-                    if (this.tasks.findIndex(t => t.id === this.tasks.id) === taskIndex) {
-                        return response.data
+                    // Reset the tasks array with the new data of the updated task
+                    this.tasks = this.tasks.map((task) => {
+                        if (this.tasks.findIndex(t => t.id === this.tasks.id) === taskIndex) {
+                            return response.data
+                        }
+                        return task
+                    })
+                } catch (error) {
+                    console.log(error)
+                }
+            },
+            async deleteTask (task) {
+                // Confirm if one wants to delete the task
+                let confirmation = confirm('Do you want to delete this task?')
+                if (confirmation) {
+                    try {
+                        // Send a request to delete the task
+                        await this.$http.delete(`http://localhost:8000/api/tasks/${task.id}/`)
+
+                        // Refresh the tasks
+                        this.getData()
+                    } catch (error) {
+                        console.log(error)
                     }
-                    return task
-                })
-            } catch (error) {
-                console.log(error)
+                }
             }
         },
         created () {
